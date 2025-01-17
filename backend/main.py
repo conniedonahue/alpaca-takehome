@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from datetime import datetime
 import os
 
-from llm_service import process_note_with_llm
+from llm_service import mock_process_note_with_llm, generate_clinical_note
 from db.models import SessionNote
 
 app = FastAPI()
@@ -47,8 +47,9 @@ async def create_session_note(
     db.commit()
     db.refresh(db_note)
 
-    # Process the note using LLM (e.g., OpenAI, etc.)
-    generated_note = process_note_with_llm(db_note.draft_note)
+    # Process the note using LLM
+    generated_note = generate_clinical_note(db_note.draft_note)
+    # mock_generated_note = process_note_with_llm(db_note.draft_note)
 
     # Update the generated note in the database
     db_note.generated_note = generated_note

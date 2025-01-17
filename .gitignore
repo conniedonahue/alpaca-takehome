@@ -62,3 +62,7 @@ Thumbs.db
 *.bak
 *.tmp
 *.temp
+
+#venv
+*alpaca_venv*
+.env
