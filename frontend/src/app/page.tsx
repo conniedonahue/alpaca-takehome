@@ -34,7 +34,7 @@ export default function Page() {
     useState<SessionDuration>("30 mins");
   const [sessionType, setSessionType] = useState<string>(sessionTypes[0]);
   const [generatedNote, setGeneratedNote] = useState<string | null>(null);
-  const [finalNote, setFinalNote] = useState<string | null>(null);
+  const [editableNote, setEditableNote] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleSubmit = async () => {
@@ -58,6 +58,7 @@ export default function Page() {
 
       if (response.ok) {
         setGeneratedNote(result.generated_note);
+        setEditableNote(result.generated_note);
       } else {
         console.error(result.detail);
       }
@@ -70,7 +71,7 @@ export default function Page() {
 
   // Function to handle final note submission (update the final note in the backend)
   const handleSaveFinalNote = async () => {
-    if (!finalNote) return;
+    if (!editableNote) return;
 
     try {
       // Send a PATCH request to update the session note with the final note
@@ -81,7 +82,7 @@ export default function Page() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          final_note: finalNote,
+          final_note: editableNote,
         }),
       });
 
@@ -104,92 +105,96 @@ export default function Page() {
       {/* Input for draft notes */}
       <div>
         <label className="block text-sm font-semibold">
-          Observations (Bullet Points)
+          {generatedNote
+            ? "Here's your tidied up notes! Make any edits you'd like."
+            : "Write your notes here"}{" "}
         </label>
         <textarea
           className="w-full p-4 mt-2 border rounded-md"
           rows={6}
-          value={draftNote}
-          onChange={(e) => setDraftNote(e.target.value)}
+          value={generatedNote ? editableNote : draftNote} // Update value to allow editing finalNote if it's available
+          onChange={(e) => {
+            if (generatedNote) {
+              setEditableNote(e.target.value); // Allow editing finalNote after generation
+            } else {
+              setDraftNote(e.target.value); // Regular editing of draftNote
+            }
+          }}
           placeholder="Enter quick observations here..."
         />
       </div>
 
       {/* Session Duration Dropdown */}
-      <div>
-        <label className="block text-sm font-semibold">Session Duration</label>
-        <select
-          id="sessionDuration"
-          className="w-full p-3 mt-2 border rounded-md"
-          value={sessionDuration}
-          onChange={(e) =>
-            setSessionDuration(e.target.value as SessionDuration)
-          }
-        >
-          <option value="">Select session duration</option>
-          {Object.keys(sessionDurations).map((duration) => (
-            <option key={duration} value={duration}>
-              {duration}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Session Type Dropdown */}
-      <div className="mb-4">
-        <label htmlFor="sessionType" className="block text-sm font-medium">
-          Session Type
-        </label>
-        <select
-          id="sessionType"
-          value={sessionType}
-          onChange={(e) => setSessionType(e.target.value)}
-          className="mt-1 p-2 w-full border rounded"
-        >
-          <option value="">Select session type</option>
-          {sessionTypes.map((type) => (
-            <option key={type} value={type}>
-              {type}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Generate Note Button */}
-      <button
-        className="w-full p-3 mt-4 bg-blue-600 text-white rounded-md"
-        onClick={handleSubmit}
-        disabled={loading}
-      >
-        {loading ? "Generating..." : "Generate Note"}
-      </button>
-
-      {/* Display Generated Note */}
-      {generatedNote && (
+      {!generatedNote && (
         <div>
-          <h3 className="text-lg font-semibold mt-6">Generated Note</h3>
-          <p className="mt-2">{generatedNote}</p>
+          <label className="block text-sm font-semibold">
+            Session Duration
+          </label>
+          <select
+            id="sessionDuration"
+            className="w-full p-3 mt-2 border rounded-md"
+            value={sessionDuration}
+            onChange={(e) =>
+              setSessionDuration(e.target.value as SessionDuration)
+            }
+          >
+            <option value="">Select session duration</option>
+            {Object.keys(sessionDurations).map((duration) => (
+              <option key={duration} value={duration}>
+                {duration}
+              </option>
+            ))}
+          </select>
         </div>
       )}
 
-      {/* Final Note Editing */}
+      {/* Session Type Dropdown */}
+      {!generatedNote && (
+        <div className="mb-4">
+          <label htmlFor="sessionType" className="block text-sm font-medium">
+            Session Type
+          </label>
+          <select
+            id="sessionType"
+            value={sessionType}
+            onChange={(e) => setSessionType(e.target.value)}
+            className="mt-1 p-2 w-full border rounded"
+          >
+            <option value="">Select session type</option>
+            {sessionTypes.map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* Generate or Save Final Note Button */}
+      <button
+        className={`w-full p-3 mt-4 ${
+          generatedNote ? "bg-green-600" : "bg-blue-600"
+        } text-white rounded-md`}
+        onClick={generatedNote ? handleSaveFinalNote : handleSubmit}
+        disabled={loading}
+      >
+        {loading
+          ? generatedNote
+            ? "Saving..."
+            : "Generating..."
+          : generatedNote
+          ? "Save Final Note"
+          : "Generate Note"}
+      </button>
+
+      {/* Display Generated Note and History */}
       {generatedNote && (
         <div>
-          <h3 className="text-lg font-semibold mt-6">Edit Final Note</h3>
-          <textarea
-            className="w-full p-4 mt-2 border rounded-md"
-            rows={6}
-            value={finalNote || generatedNote}
-            onChange={(e) => setFinalNote(e.target.value)}
-            placeholder="Edit your final note here..."
-          />
-          <button
-            className="w-full p-3 mt-4 bg-green-600 text-white rounded-md"
-            onClick={handleSaveFinalNote}
-            disabled={loading}
-          >
-            {loading ? "Saving..." : "Save Final Note"}
-          </button>
+          <h3 className="text-lg font-semibold mt-6">History</h3>
+          <p className="mt-2 text-gray-500">{draftNote}</p>{" "}
+          {/* Original Note */}
+          <p className="mt-2">{generatedNote}</p>
+          <p className="mt-2">{editableNote}</p>
         </div>
       )}
     </div>

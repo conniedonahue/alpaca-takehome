@@ -27,8 +27,17 @@ def generate_clinical_note(draft_note: str) -> str:
         str: The generated clinical note.
     """
     prompt = f"""
-    You are an experienced clinical therapist. Please transform the following draft into a professional clinical note in ABA (Applied Behavioral Analysis) style:
-    \n\n{draft_note}\n\nPlease provide clear, concise, and accurate language suitable for clinical documentation.
+    You are an experienced clinical therapist. Transform the following draft into a clear, professional clinical summary in ABA (Applied Behavioral Analysis) style. Focus only on summarizing the key clinical observations and interventions.
+
+    Guidelines:
+    - Write in a clear, concise paragraph format
+    - Do not include date, time, or session logistics as fields, or a signature 
+    - Focus on behaviors, interventions, and outcomes
+    - Use objective, professional language
+    - Keep the format simple and straightforward
+
+    Draft note:
+    {draft_note}
     """
     
     try:
