@@ -36,11 +36,10 @@ async def create_session_note(
         JSON: Generated Note
     
     """
-     # Save the draft note to the database
     db_note = SessionNote(
         session_duration=session_note.session_duration,
         session_type=session_note.session_type,
-        draft_note=session_note.notes,  # Assuming 'observations' is the draft note
+        draft_note=session_note.notes,
     )
     
     db.add(db_note)
@@ -49,9 +48,7 @@ async def create_session_note(
 
     # Process the note using LLM
     generated_note = generate_clinical_note(db_note.draft_note)
-    # mock_generated_note = process_note_with_llm(db_note.draft_note)
 
-    # Update the generated note in the database
     db_note.generated_note = generated_note
     db.commit()
     

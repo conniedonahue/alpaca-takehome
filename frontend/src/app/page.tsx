@@ -86,7 +86,7 @@ export default function Page() {
     }
   };
 
-  // Sends PATCH req to updated Final Note field
+  // Sends PATCH req to updated Final Note collumn
   const handleSaveFinalNote = async () => {
     if (!editableNote || noteId === null) return;
 
@@ -152,12 +152,12 @@ export default function Page() {
         <textarea
           className="w-full p-4 mt-2 border rounded-md"
           rows={6}
-          value={generatedNote ? editableNote : draftNote} // Update value to allow editing finalNote if it's available
+          value={generatedNote ? editableNote : draftNote}
           onChange={(e) => {
             if (generatedNote) {
-              setEditableNote(e.target.value); // Allow editing finalNote after generation
+              setEditableNote(e.target.value);
             } else {
-              setDraftNote(e.target.value); // Regular editing of draftNote
+              setDraftNote(e.target.value);
             }
           }}
           placeholder="Enter quick observations here..."

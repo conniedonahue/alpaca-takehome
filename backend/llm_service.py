@@ -11,13 +11,9 @@ from fastapi import HTTPException, Depends
 from dotenv import load_dotenv
 import os
 
-# Load environment variables
 load_dotenv()
-
-# Set OpenAI API key from .env file
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# Prompt engineering example for clinical writing style
 def generate_clinical_note(draft_note: str) -> str:
     """
     Sends the draft note to OpenAI and returns the generated note with clinical writing style.
