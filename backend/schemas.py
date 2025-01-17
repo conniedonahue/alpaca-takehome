@@ -8,3 +8,6 @@ class SessionNoteCreate(BaseModel):
 
     class Config:
         orm_mode = True
+
+class SessionNoteUpdate(BaseModel):
+    final_note: str
