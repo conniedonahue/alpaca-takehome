@@ -43,6 +43,7 @@ export default function Page() {
   const [editableNote, setEditableNote] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [noteId, setNoteId] = useState<number | null>(null);
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -74,6 +75,7 @@ export default function Page() {
         ]);
         setGeneratedNote(result.generated_note);
         setEditableNote(result.generated_note);
+        setNoteId(result.note_id);
       } else {
         console.error(result.detail);
       }
@@ -84,22 +86,23 @@ export default function Page() {
     }
   };
 
-  // Function to handle final note submission (update the final note in the backend)
+  // Sends PATCH req to updated Final Note field
   const handleSaveFinalNote = async () => {
-    if (!editableNote) return;
+    if (!editableNote || noteId === null) return;
 
     try {
-      // Send a PATCH request to update the session note with the final note
-      const response = await fetch(`http://localhost:8000/session-notes/${1}`, {
-        // Adjust `1` with the actual note ID if needed
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          final_note: editableNote,
-        }),
-      });
+      const response = await fetch(
+        `http://localhost:8000/session-notes/${noteId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            final_note: editableNote,
+          }),
+        }
+      );
 
       const result = await response.json();
 
