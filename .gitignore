@@ -25,6 +25,9 @@ pip-log.txt
 pip-delete-this-directory.txt
 .pytest_cache/
 
+# Dummy DB
+test.db
+
 # JavaScript/TypeScript (Next.js)
 node_modules/
 .next/
