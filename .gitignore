@@ -41,6 +41,7 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
+frontend/package-lock.json
 
 # IDEs and editors
 .idea/
